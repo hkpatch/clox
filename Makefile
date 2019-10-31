@@ -1,4 +1,4 @@
-objects = main.o chunk.o debug.o memory.o value.o vm.o
+objects = main.o chunk.o debug.o memory.o value.o vm.o scanner.o
 CC = gcc -Iinclude
 VPATH = src
 
@@ -22,7 +22,10 @@ memory.o : memory.c
 value.o : value.c 
 	$(CC) -c -o $@ $<
 
-vm.o : vm.c
+vm.o : vm.c 
+	$(CC) -c -o $@ $<
+
+scanner.o : scanner.c
 	$(CC) -c -o $@ $<
 
 .PHONY: clean
