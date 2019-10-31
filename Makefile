@@ -1,5 +1,5 @@
 objects = main.o chunk.o debug.o memory.o value.o vm.o scanner.o
-CC = gcc -Iinclude
+CC = gcc -Iinclude -std=c11
 VPATH = src
 
 all : clox clean

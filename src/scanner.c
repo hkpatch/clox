@@ -86,6 +86,56 @@ static Token string(){
     return makeToken(TOKEN_STRING);
 }
 
+bool isDigit(char c){
+    return (c >= '0' && c <= '9');
+}
+
+bool isAlpha(char c){
+    return (c >= 'a' && c <= 'z') ||
+        (c >= 'A' && c <= 'Z') || 
+        (c == '_');
+}
+
+static Token number(){
+    while(isDigit(peek())){
+        advance();
+    }
+
+    if(peek() == '.' && isDigit(peekNext())){
+        advance();
+        while(isDigit(peek())) advance();
+    }
+
+    return makeToken(TOKEN_NUMBER);
+}
+
+static bool checkKeyword(int start, int length, 
+    const char *rest, TokenType type){
+    if((scanner.current - scanner.start) == length &&
+        memcmp(scanner.start + start, rest, length) == 0){
+        return type;
+    }
+
+    return TOKEN_IDENTIFIER;
+}
+
+static TokenType identifierType(){
+    switch (scanner.start[0]){
+        case 'a': return checkKeyword(1, 2, "nd", TOKEN_AND);
+        case 'c': return checkKeyword(1, 4, "lass", TOKEN_CLASS);
+        //TODO
+    }
+    return TOKEN_IDENTIFIER;
+}
+
+static Token identifier(){
+    while(isDigit(peek()) || isAlpha(peek())){
+        advance();
+    }
+
+    return makeToken(identifierType());
+}
+
 Token scanToken(){
     skipWhiteSpace();
     scanner.start = scanner.current;
@@ -121,7 +171,9 @@ Token scanToken(){
 
         default:
             if(isDigit(c)){
-                
+                return number();
+            } else if(isAlpha(c)){
+                return identifier();
             }
     }
 
