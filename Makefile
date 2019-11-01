@@ -1,5 +1,5 @@
-objects = main.o chunk.o debug.o memory.o value.o vm.o scanner.o
-CC = gcc -Iinclude -std=c11
+objects = main.o chunk.o debug.o memory.o value.o vm.o scanner.o compile.o
+CC = gcc -Iinclude -std=c11 -g
 VPATH = src
 
 all : clox clean
@@ -26,6 +26,9 @@ vm.o : vm.c
 	$(CC) -c -o $@ $<
 
 scanner.o : scanner.c
+	$(CC) -c -o $@ $<
+
+compile.o: compile.c
 	$(CC) -c -o $@ $<
 
 .PHONY: clean

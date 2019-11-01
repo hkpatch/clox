@@ -74,6 +74,8 @@ static Token errorToken(const char *msg){
     token.start = msg;
     token.length = (int)strlen(msg);
     token.line = scanner.line;
+
+    return token;
 }
 
 static Token string(){
@@ -83,6 +85,9 @@ static Token string(){
     }
 
     if(isAtEnd()) return errorToken("Unterminated string.");
+
+    // 跳过'"'
+    advance();
     return makeToken(TOKEN_STRING);
 }
 
@@ -202,11 +207,28 @@ Token scanToken(){
             }
     }
 
-    
+    return errorToken("Unexpected character.");
 }
 
 void initScanner(char *source){
     scanner.current = source;
     scanner.start = source;
     scanner.line = 1;
+}
+
+void printToken(char *source){
+    initScanner(source);
+    int line = -1;
+    for(;;){
+        Token token = scanToken();
+        if(token.line != line){
+            line = token.line;
+            printf("%4d ", line);
+        } else{
+            printf("   | ");
+        }
+        printf("%2d '%.*s'\n", token.type, token.length, token.start);
+
+        if(token.type == TOKEN_EOF) break;
+    }
 }

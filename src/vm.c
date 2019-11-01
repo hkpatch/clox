@@ -2,6 +2,7 @@
 #include "value.h"
 #include "debug.h"
 #include "scanner.h"
+#include "compile.h"
 
 VM vm;
 
@@ -20,20 +21,25 @@ void freeVM(){
 }
 
 InterpretResult interpret(char *source){
-    initScanner(source);
-    int line = -1;
-    for(;;){
-        Token token = scanToken();
-        if(token.line != line){
-            line = token.line;
-            printf("%4d ", line);
-        } else{
-            printf("   | ");
-        }
-        printf("%2d '%.*s'\n", token.type, token.length, token.start);
+    printToken(source);
+    return INTERPRET_OK;
 
-        if(token.type == TOKEN_EOF) break;
+    Chunk chunk;
+    initChunk(&chunk);
+
+    if(!compile(source, &chunk)){
+        freeChunk(&chunk);
+        return INTERPRET_COMPILE_ERROR;
     }
+
+    vm.chunk = &chunk;
+    vm.ip = vm.chunk->code;
+
+    InterpretResult result = run();
+
+    freeChunk(&chunk);
+    return result;
+    
 }
 
 static InterpretResult run(){

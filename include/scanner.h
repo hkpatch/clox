@@ -36,5 +36,6 @@ typedef struct Token{
 
 void initScanner(char *source);
 Token scanToken();
+void printToken();
 
 #endif
