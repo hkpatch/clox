@@ -19,6 +19,8 @@ typedef struct Chunk{
     int capacity;    
     uint8_t *code;
     int *lines;
+    /* 相应的常量保存在constants数组里，所以Chunk里对于常量
+    只保存了constants数组的下标 */
     ValueArray constants;
 } Chunk;
 

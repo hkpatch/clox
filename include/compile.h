@@ -3,6 +3,6 @@
 
 #include "vm.h"
 
-InterpretResult compile(char *source, Chunk *chunk);
+bool compile(char *source, Chunk *chunk);
 
 #endif
