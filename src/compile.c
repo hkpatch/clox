@@ -82,8 +82,58 @@ static void emitTwoByte(uint8_t byte1, uint8_t byte2){
     emitByte(byte2);
 }
 
-static void endCompiler(){
+static void emitReturn(){
     emitByte(OP_RETURN);
+}
+
+static uint8_t makeConstant(Value value){
+    int index = addConstant(currentChunk(), value);
+    if(index > UINT8_MAX){
+        error("Too mant constants in one chunk.");
+        return 0;
+    }
+
+    return (uint8_t)index;
+}
+
+static void emitConstant(Value value){
+    emitTwoByte(OP_CONSTANT, makeConstant(value));
+}
+
+static void endCompiler(){
+    emitReturn();
+}
+
+static void grouping(){
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+}
+
+static void number(){
+    double value = strtod(parser.previous.start, NULL);
+    emitConstant(value);
+}
+
+static void unary(){
+    TokenType operatorType = parser.previous.type;
+
+    // Compile the operand.
+    // -a.b + c会出问题，暂时会变成(a.b + c)
+    expression();
+
+    switch (operatorType)
+    {
+    case TOKEN_MINUS:
+        emitByte(OP_NEGATE);
+        break;
+    
+    default:
+        return;
+    }
+}
+
+void expression(){
+
 }
 
 bool compile(char *source, Chunk *chunk){
@@ -94,7 +144,8 @@ bool compile(char *source, Chunk *chunk){
     parser.panicMode = false;
 
     advance();
-    //expression();
+    // TODO : expression，连接源代码与字节码的关键点
+    expression();
     consume(TOKEN_EOF, "Expect end of expression.");
 
     /* 因为return语句会弹出执行栈中的一个变量并打印出来，所以这里加上return语句 */

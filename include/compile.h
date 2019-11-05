@@ -4,5 +4,6 @@
 #include "vm.h"
 
 bool compile(char *source, Chunk *chunk);
+void expression();
 
 #endif
