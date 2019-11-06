@@ -13,6 +13,20 @@ typedef struct Parser{
     bool panicMode;
 } Parser;
 
+typedef enum{
+    PREC_NONE,
+    PREC_ASSIGNMENT,    // =
+    PREC_OR,            // or
+    PREC_AND,           // and
+    PREC_EQUALITY,      // == !=
+    PREC_COMPARISON,    // < > <= >=
+    PREC_TERM,          // + -
+    PREC_FACTOR,        // * /
+    PREC_UNARY,         // ! -
+    PREC_CALL,          // . () []
+    PREC_PRIMARY
+} Precedence;
+
 Parser parser;
 
 Chunk *compilingChunk;
@@ -104,22 +118,18 @@ static void endCompiler(){
     emitReturn();
 }
 
-static void grouping(){
-    expression();
-    consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
-}
+static void binary(){
+    // Remember the operator.
+    TokenType operatorType = parser.previous.type;
 
-static void number(){
-    double value = strtod(parser.previous.start, NULL);
-    emitConstant(value);
+    
 }
 
 static void unary(){
     TokenType operatorType = parser.previous.type;
 
     // Compile the operand.
-    // -a.b + c会出问题，暂时会变成(a.b + c)
-    expression();
+    parsePrecedence(PREC_UNARY);
 
     switch (operatorType)
     {
@@ -132,8 +142,22 @@ static void unary(){
     }
 }
 
-void expression(){
+static void grouping(){
+    expression();
+    consume(TOKEN_RIGHT_PAREN, "Expect ')' after expression.");
+}
 
+static void number(){
+    double value = strtod(parser.previous.start, NULL);
+    emitConstant(value);
+}
+
+static void parsePrecedence(Precedence precedence){
+
+}
+
+void expression(){
+    parsePrecedence(PREC_ASSIGNMENT);
 }
 
 bool compile(char *source, Chunk *chunk){
