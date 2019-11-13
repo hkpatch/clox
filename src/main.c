@@ -4,6 +4,7 @@
 #include "value.h"
 #include "vm.h"
 
+/*bug: -1+2*3/(3)*/
 void repl(){
     char line[1024];
     for(;;){

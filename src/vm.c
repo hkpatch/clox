@@ -21,8 +21,8 @@ void freeVM(){
 }
 
 InterpretResult interpret(char *source){
-    printToken(source);
-    return INTERPRET_OK;
+    //printToken(source);
+    //return INTERPRET_OK;
 
     Chunk chunk;
     initChunk(&chunk);
