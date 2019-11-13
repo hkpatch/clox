@@ -185,7 +185,7 @@ static void number(){
     emitConstant(value);
 }
 
-// 1+2*(3+1)
+// (3+1)
 static void parsePrecedence(Precedence precedence){
     advance();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
@@ -227,7 +227,7 @@ bool compile(char *source, Chunk *chunk){
 
 
 ParseRule rules[] = {                                              
-  { grouping, NULL,    PREC_PRIMARY},       // TOKEN_LEFT_PAREN      
+  { grouping, NULL,    PREC_NONE},       // TOKEN_LEFT_PAREN      
   { NULL,     NULL,    PREC_NONE },       // TOKEN_RIGHT_PAREN     
   { NULL,     NULL,    PREC_NONE },       // TOKEN_LEFT_BRACE
   { NULL,     NULL,    PREC_NONE },       // TOKEN_RIGHT_BRACE     
