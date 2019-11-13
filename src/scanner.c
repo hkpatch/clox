@@ -50,6 +50,8 @@ static void skipWhiteSpace(){
             case '/':
                 if(peekNext() == '/'){
                     while(!isAtEnd() && peek() != '\n') advance();
+                } else{
+                    return;
                 }
                 break;
             default:

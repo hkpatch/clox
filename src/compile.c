@@ -4,6 +4,12 @@
 #include "compile.h"
 #include "scanner.h"
 
+#define DEBUG_PRINT_CODE
+
+#ifdef DEBUG_PRINT_CODE
+#include "debug.h"
+#endif
+
 /* Compile: 从源代码转换成字节码，SourceCode-->Chunk */
 
 typedef struct Parser{
@@ -122,8 +128,15 @@ static void emitConstant(Value value){
     emitTwoByte(OP_CONSTANT, makeConstant(value));
 }
 
+
 static void endCompiler(){
     emitReturn();
+
+#ifdef DEBUG_PRINT_CODE
+    if(!parser.hadError){
+        disassembleChunk(currentChunk(), "code");
+    }
+#endif
 }
 
 static void binary(){
@@ -172,6 +185,7 @@ static void number(){
     emitConstant(value);
 }
 
+// 1+2*(3+1)
 static void parsePrecedence(Precedence precedence){
     advance();
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
@@ -213,7 +227,7 @@ bool compile(char *source, Chunk *chunk){
 
 
 ParseRule rules[] = {                                              
-  { grouping, NULL,    PREC_NONE },       // TOKEN_LEFT_PAREN      
+  { grouping, NULL,    PREC_PRIMARY},       // TOKEN_LEFT_PAREN      
   { NULL,     NULL,    PREC_NONE },       // TOKEN_RIGHT_PAREN     
   { NULL,     NULL,    PREC_NONE },       // TOKEN_LEFT_BRACE
   { NULL,     NULL,    PREC_NONE },       // TOKEN_RIGHT_BRACE     
