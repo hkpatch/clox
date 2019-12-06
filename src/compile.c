@@ -188,6 +188,7 @@ static void number(){
 // (3+1)
 static void parsePrecedence(Precedence precedence){
     advance();
+    // 先处理优先级较高的前缀表达式
     ParseFn prefixRule = getRule(parser.previous.type)->prefix;
     if(prefixRule == NULL){
         error("Expect expression.");
@@ -196,6 +197,7 @@ static void parsePrecedence(Precedence precedence){
 
     prefixRule();
 
+    // 然后如果后面有更高和相等优先级的操作符
     while(precedence <= getRule(parser.current.type)->precedence){
         advance();
         ParseFn infixRule = getRule(parser.previous.type)->infix;
