@@ -116,9 +116,9 @@ static Token number(){
     return makeToken(TOKEN_NUMBER);
 }
 
-static bool checkKeyword(int start, int length, 
+static TokenType checkKeyword(int start, int length, 
     const char *rest, TokenType type){
-    if((scanner.current - scanner.start) == length &&
+    if((scanner.current - scanner.start) == start + length &&
         memcmp(scanner.start + start, rest, length) == 0){
         return type;
     }
@@ -192,11 +192,11 @@ Token scanToken(){
         case '!': 
             return makeToken(match('=') ? TOKEN_BANG_EQUAL : TOKEN_BANG);
         case '=':
-            return makeToken(match('=' ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL));
+            return makeToken(match('=') ? TOKEN_EQUAL_EQUAL : TOKEN_EQUAL);
         case '>':
-            return makeToken(match('=' ? TOKEN_GREATER_EQUAL : TOKEN_GREATER));
+            return makeToken(match('=') ? TOKEN_GREATER_EQUAL : TOKEN_GREATER);
         case '<':
-            return makeToken(match('=' ? TOKEN_LESS_EQUAL : TOKEN_LESS));
+            return makeToken(match('=') ? TOKEN_LESS_EQUAL : TOKEN_LESS);
         
         case '"':
             return string();

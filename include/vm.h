@@ -25,5 +25,6 @@ void freeVM();
 InterpretResult interpret(char *source);
 void push(Value value);
 Value pop();
+Value peek(int distanse);
 
 #endif
