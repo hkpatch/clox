@@ -1,6 +1,8 @@
 #ifndef clox_value_h
 #define clox_value_h
 
+typedef struct sObj Obj;
+
 typedef enum {
     VAL_BOOL,
     VAL_NIL,

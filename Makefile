@@ -1,4 +1,5 @@
-objects = main.o chunk.o debug.o memory.o value.o vm.o scanner.o compile.o
+objects = main.o chunk.o debug.o memory.o value.o vm.o \
+	scanner.o compile.o object.o
 CC = gcc -Iinclude -std=c11 -g
 VPATH = src
 
@@ -30,6 +31,8 @@ scanner.o : scanner.c
 
 compile.o: compile.c
 	$(CC) -c -o $@ $<
+
+object.o: object.c
 
 .PHONY: clean
 clean : 

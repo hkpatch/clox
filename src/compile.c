@@ -3,8 +3,9 @@
 
 #include "compile.h"
 #include "scanner.h"
+#include "object.h"
 
-#define DEBUG_PRINT_CODE
+//#define DEBUG_PRINT_CODE
 
 #ifdef DEBUG_PRINT_CODE
 #include "debug.h"
@@ -206,6 +207,11 @@ static void number(){
     emitConstant(NUMBER_VAL(value));
 }
 
+static void string(){
+    emitConstant(OBJ_VAL(copyString
+    (parser.previous.start + 1, parser.previous.length-2)));
+}
+
 // (3+1)
 static void parsePrecedence(Precedence precedence){
     advance();
@@ -270,7 +276,7 @@ ParseRule rules[] = {
   { NULL,     binary,  PREC_COMPARISON },       // TOKEN_LESS            
   { NULL,     binary,  PREC_COMPARISON },       // TOKEN_LESS_EQUAL      
   { NULL,     NULL,    PREC_NONE },       // TOKEN_IDENTIFIER      
-  { NULL,     NULL,    PREC_NONE },       // TOKEN_STRING          
+  { string,     NULL,    PREC_NONE },       // TOKEN_STRING          
   { number,   NULL,    PREC_NONE },       // TOKEN_NUMBER          
   { NULL,     NULL,    PREC_NONE },       // TOKEN_AND             
   { NULL,     NULL,    PREC_NONE },       // TOKEN_CLASS           

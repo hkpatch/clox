@@ -5,12 +5,15 @@
 #include "debug.h"
 #include "scanner.h"
 #include "compile.h"
+#include "object.h"
+#include "memory.h"
 
 VM vm;
 
 static InterpretResult run();
 static void runtimeError(const char *format, ...);
 static bool isFalsey(Value value);
+static void concatenate();
 
 static void resetStack(){
     vm.stackTop = vm.stack;
@@ -18,10 +21,12 @@ static void resetStack(){
 
 void initVM(){
     resetStack();
+    
+    vm.objects = NULL;
 }
 
 void freeVM(){
-
+    freeObjects();
 }
 
 InterpretResult interpret(char *source){
@@ -60,6 +65,8 @@ static InterpretResult run(){
         push(valueType(a op b)); \
     } while(0)
 
+/* ------------------------------------------------------------------ */
+
     for(;;){
 #ifdef DEBUG_TRACE_EXECUTION
         printf("          ");
@@ -92,7 +99,19 @@ static InterpretResult run(){
             case OP_NIL:    push(NIL_VAL); break;
             case OP_TRUE:   push(BOOL_VAL(true)); break;
             case OP_FALSE:  push(BOOL_VAL(false)); break;
-            case OP_ADD:        BINARY_OP(NUMBER_VAL, +); break;
+            case OP_ADD: {
+                if(IS_STRING(peek(0)) && IS_STRING(peek(1))){
+                    concatenate();
+                } else if(IS_NUMBER(peek(0)) && IS_NUMBER(peek(1))){
+                    double b = AS_NUMBER(pop());
+                    double a = AS_NUMBER(pop());
+                    push(NUMBER_VAL(a+b));
+                } else{
+                    runtimeError("Operands must be two numbers or two strings.");
+                    return INTERPRET_RUNTIME_ERROR;
+                }
+                break;
+            }
             case OP_SUBTRACT:   BINARY_OP(NUMBER_VAL, -); break;
             case OP_MULTIPLY:   BINARY_OP(NUMBER_VAL, *); break;
             case OP_DIVIDE:     BINARY_OP(NUMBER_VAL, /); break;
@@ -133,6 +152,20 @@ Value peek(int distanse){
 
 static bool isFalsey(Value value){
     return IS_NIL(value) || (IS_BOOL(value) && !AS_BOOL(value));
+}
+
+static void concatenate() {
+    ObjString *b = AS_STRING(pop());
+    ObjString *a = AS_STRING(pop());
+
+    int length = a->length + b->length;
+    char *chars = NEW(length);
+    memcpy(chars, a->chars, length);
+    memcpy(chars + a->length, b->chars, b->length);
+    chars[length] = '\0';
+
+    ObjString *result = takeString(chars, length);
+    push(OBJ_VAL(result));
 }
 
 static void runtimeError(const char *format, ...){

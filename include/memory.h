@@ -8,6 +8,12 @@
     (type*)reallocate(previous, sizeof(type) * (oldCount), \
         sizeof(type) * (count))
 
+#define ALLOCATE(type, count) \
+    (type *)reallocate(NULL, 0, sizeof(type) * (count))
+
+#define NEW(size) alloc(size)
+
 void *reallocate(void *previous, size_t oldSize, size_t newSize);
+void *alloc(size_t size);
 
 #endif
