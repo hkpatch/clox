@@ -8,6 +8,17 @@
 #define ALLOCATE_OBJ(type, objectType) \
     (type *)allocateObject(sizeof(type), objectType)
 
+static uint32_t hashString(const char* key, int length) {
+  uint32_t hash = 2166136261u;
+
+  for (int i = 0; i < length; i++) {                     
+    hash ^= key[i];                                      
+    hash *= 16777619;                                    
+  }                                                      
+
+  return hash;                                           
+}  
+
 static Obj *allocateObject(size_t size, ObjType type){
     Obj *obj = NEW(size);
     obj->type = type;
@@ -24,6 +35,7 @@ static ObjString *allocateString(char *chars, int length){
     // 初始化子类
     obj->chars = chars;
     obj->length = length;
+    obj->hash = hashString(chars, length);
 
     return obj;
 }

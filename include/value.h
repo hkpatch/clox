@@ -2,6 +2,7 @@
 #define clox_value_h
 
 typedef struct sObj Obj;
+typedef struct sObjString ObjString;
 
 typedef enum {
     VAL_BOOL,
