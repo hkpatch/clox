@@ -2,6 +2,7 @@
 #define clox_object_h
 
 #include <stdbool.h>
+#include <stdint.h>
 #include "value.h"
 
 typedef enum {
