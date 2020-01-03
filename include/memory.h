@@ -8,12 +8,18 @@
     (type*)reallocate(previous, sizeof(type) * (oldCount), \
         sizeof(type) * (count))
 
+#define FREE_ARRAY(pointer, type, oldCount) \
+    reallocate(pointer, sizeof(type) * (oldCount), 0)
+
 #define ALLOCATE(type, count) \
     (type *)reallocate(NULL, 0, sizeof(type) * (count))
 
-#define NEW(size) alloc(size)
+#define NEW(size) \
+    reallocate(NULL, 0, size)
+
+#define FREE(pointer, type) \
+    reallocate(pointer, sizeof(type), 0)
 
 void *reallocate(void *previous, size_t oldSize, size_t newSize);
-void *alloc(size_t size);
 
 #endif

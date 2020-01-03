@@ -35,12 +35,18 @@ static ObjString *allocateString(char *chars, int length){
     // 初始化子类
     obj->chars = chars;
     obj->length = length;
+    tableSet(&vm.strings, obj, NIL_VAL);
     obj->hash = hashString(chars, length);
 
     return obj;
 }
 
 ObjString *copyString(const char *chars, int length){
+    uint32_t hash = hashString(chars, length);
+    ObjString *interned = tableFindString(&vm.strings, 
+        chars, length, hash);
+    if (interned != NULL) return interned;
+
     char *heapChars = ALLOCATE(char, length + 1);
     memcpy(heapChars, chars, length);
     heapChars[length] = '\0';
@@ -49,6 +55,14 @@ ObjString *copyString(const char *chars, int length){
 }
 
 ObjString *takeString(char *chars, int length){
+    uint32_t hash = hashString(chars, length);
+    ObjString *interned = tableFindString(&vm.strings, 
+        chars, length, hash);
+    if (interned != NULL) {
+        FREE_ARRAY(chars, char, length + 1);
+        return interned;
+    }
+
     return allocateString(chars, length);
 }
 
@@ -58,8 +72,10 @@ static void freeObject(Obj *object){
             ObjString *string = (ObjString *)object;
             // 在原文中用自己的reallocate而不直接用free的原因是为了
             // 方便统计已分配的内存
-            free(string->chars);
-            free(string);
+            FREE_ARRAY(string->chars, char, string->length);
+            FREE(string, ObjString);
+            //free(string->chars);
+            //free(string);
         }
     }
 }

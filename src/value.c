@@ -22,7 +22,8 @@ void writeValueArray(ValueArray *array, Value value){
 }
 
 void freeValueArray(ValueArray *array){
-    free(array->values);
+    FREE_ARRAY(array->values, Value, array->capacity);
+    //free(array->values);
     initValueArray(array);
 }
 
@@ -43,10 +44,11 @@ bool valuesEqual(Value a, Value b){
         case VAL_BOOL:  return AS_BOOL(a) == AS_BOOL(b);
         case VAL_NIL:   return true;
         case VAL_OBJ: {
-            ObjString *aString = AS_STRING(a);
-            ObjString *bString = AS_STRING(b);
-            return aString->length == bString->length &&
-                !memcmp(aString->chars, bString->chars, aString->length);
+            // ObjString *aString = AS_STRING(a);
+            // ObjString *bString = AS_STRING(b);
+            // return aString->length == bString->length &&
+            //     !memcmp(aString->chars, bString->chars, aString->length);
+            return AS_OBJ(a) == AS_OBJ(b);
         }        
     }
 }
